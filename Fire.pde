@@ -12,6 +12,8 @@ class Fire {
   PImage [] fireworks = new PImage[fireworksNum];
   PImage [] sit = new PImage[2];
   PImage [] prop = new PImage[2];
+  AudioPlayer s4_fire = minim.loadFile("img/stage 4/Fireworks/sound/firework_in_a_stadium.mp3");
+  AudioPlayer ah = minim.loadFile("img/stage 3/sound/crow1.mp3");
 
   Fire() {
     T = 0;
@@ -92,6 +94,7 @@ class Fire {
 
 
       for (int b=0; b<fireworksNum; b++) {
+        s4_fire.play();
         if (T%25==0) {
           c[b] = floor(random(2));
           x[b] = random(-100, 500);

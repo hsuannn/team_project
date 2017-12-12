@@ -11,6 +11,8 @@ class Home {
   final int TALKING=0;
   final int SAYLIKE=1;
   final int FAIL=2;
+  AudioPlayer s4_door = minim.loadFile("img/stage 4/Home/sound/iron_door2_O.mp3");
+  AudioPlayer ah = minim.loadFile("img/stage 3/sound/crow1.mp3");
 
   //initialization
 
@@ -30,6 +32,7 @@ class Home {
 
     currentFrameB=0;// interrupt
     for (int x = 0; x < 2; x ++) {
+      s4_door.play();
       interrupt[x]=loadImage("img/stage 4/Home/"+"IMG_63"+(x+20)+".PNG");
     }
     // frameRate(2);

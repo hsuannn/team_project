@@ -7,6 +7,11 @@ class Sea {
   PImage [] propose = new PImage [2] ;
   PImage [] success = new PImage [5] ;
   int stageProposal;
+  AudioPlayer s4_beach = minim.loadFile("img/stage 4/Seaside/sound/summer_beach2.mp3");
+  AudioPlayer clap = minim.loadFile("img/stage 3/sound/clapping_short.mp3");
+  AudioPlayer ah = minim.loadFile("img/stage 3/sound/crow1.mp3");
+
+
   Sea() {
     T = 0;
     //propose
@@ -15,7 +20,7 @@ class Sea {
     }
 
     //success
-
+    clap.play();
     for (int s = 0; s < 4; s ++) {
       success[s]=loadImage("img/stage 4/Seaside/success"+(s+1)+".PNG");
     }
@@ -36,6 +41,7 @@ class Sea {
   }
 
   void display() {
+    s4_beach.play();
     t = T/30;
     switch(stageProposal) {
 

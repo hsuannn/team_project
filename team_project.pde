@@ -67,7 +67,7 @@ Button [] mail = new Button[5];
 
 import ddf.minim.*;
 Minim minim;
-AudioPlayer s1_bg,s1_heart,s2_bur,s3_car,clap,ah,s4_fire,s4_door,s4_beach;
+AudioPlayer bg,s1_heart,s2_bur,s3_car,clap,ah,s4_fire,s4_door,s4_beach;
 
 boolean isMovingUp;
 boolean isMovingDown;
@@ -88,6 +88,7 @@ Button gameStart, intro;
 
 
 void setup () {
+  minim = new Minim(this);
   size(500, 500);
   boy = new Boy();
   mailgirl = new Mailgirl();
@@ -98,6 +99,8 @@ void setup () {
   name_img = loadImage("img/開頭/enter_name.png");
   s1 = loadImage("img/stage 1/stage1.png");
   s1_text = loadImage("img/stage 1/stage1_text.png");
+  bg = minim.loadFile("img/stage 1/sound/background_music.mp3");
+  s1_heart = minim.loadFile("img/stage 1/sound/heartbeats.mp3");
   gameStart = new Button("img/開頭/start_button", 300, 380);
   intro = new Button("img/開頭/intro_button", 100, 380);
   for (int a=0; a<5; a++)
@@ -113,6 +116,7 @@ void setup () {
   /* 2 */
   s2 = loadImage ("img/stage 2/stage2.png");
   s2_text = loadImage ("img/stage 2/stage2_text.png");
+  s2_bur = minim.loadFile("img/stage 2/sound/burp1.mp3");
   burp = loadImage ("img/stage 2/burp.PNG");
   rude = loadImage ("img/stage 2/rude.PNG");
   girle1 = loadImage ("img/stage 2/gfEating1.PNG");
@@ -131,6 +135,7 @@ void setup () {
   /* 3 */
   s3_text = loadImage ("img/stage 3/stage3_text.png");
   s3 = loadImage ("img/stage 3/stage3.png");
+  s3_car = minim.loadFile("img/stage 3/sound/car_road3.mp3");
   imgboom = loadImage ("img/stage 3/blood.png");
   wait1 = loadImage ("img/stage 3/waiting1.PNG");
   wait2 = loadImage ("img/stage 3/waiting2.PNG");
@@ -167,15 +172,18 @@ void setup () {
   firework = new Button("img/stage 4/stage4_button1", width/4-50, height/2);
   seaside = new Button("img/stage 4/stage4_button2", width/2-50, height/2);
   gfhome = new Button("img/stage 4/stage4_button3", width*3/4-50, height/2);
+  AudioPlayer ah = minim.loadFile("img/stage 3/sound/crow1.mp3");
 }
 
 void draw() {
   background(255);
+  //bg.play();
   switch(state) {
   case GameState.START:
     image(title_img, 20, 70);
     gameStart.display();
     intro.display();
+    bg.play();
     break;
 
   case GameState.INTRO:
@@ -217,8 +225,11 @@ void draw() {
       boy.draw();
       mailgirl.draw();
       score.draw();
-      if (mailClick)
+      if (mailClick){
+        s1_heart.setVolume(10);
+        s1_heart.play();
         line.move();
+      }
       break;
     }
     break;
@@ -328,6 +339,7 @@ void draw() {
     break;
 
   case GameState.STAGE_3:
+    s3_car.play();
     if (gee.x>=450)
     {
       gee.x=450;
@@ -438,6 +450,7 @@ void draw() {
     break;
 
   case GameState.STAGE_4:
+    s3_car.pause();
     if (millis()-time <= timeWait) {
       image(s4_text, 90, 160);
       textSize(20); 
@@ -476,14 +489,17 @@ void draw() {
       fill(0);
       text(name+"!!!!!", 250, 250);
     } else {
-      if (score.value==1)
+      if (score.value==1){
+        ah.play();
         image(one, 0, 0);
-      else if (score.value==2)
+      }else if (score.value==2){
+        ah.play();
         image(two, 0, 0);
-      else if (score.value==3)
+      }else if (score.value==3){
         image(three, 0, 0);
-      else if (score.value==4||score.value==5)
+      }else if (score.value==4||score.value==5){
         image(four, 0, 0);
+      }
       //score.draw();
     }
     break;
@@ -546,6 +562,7 @@ void keyReleased() {
   }
   if (key == ' ') {
     if (state == GameState.STAGE_2) {
+      s2_bur.play();
       bur = 1;
       count++;
       isStop_2 = true;
