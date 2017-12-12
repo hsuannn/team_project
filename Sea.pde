@@ -20,7 +20,6 @@ class Sea {
     }
 
     //success
-    clap.play();
     for (int s = 0; s < 4; s ++) {
       success[s]=loadImage("img/stage 4/Seaside/success"+(s+1)+".PNG");
     }
@@ -76,6 +75,8 @@ class Sea {
       break;
 
     case SUCCESS:
+      clap.play();
+
       background(255);
 
 

@@ -32,7 +32,6 @@ class Home {
 
     currentFrameB=0;// interrupt
     for (int x = 0; x < 2; x ++) {
-      s4_door.play();
       interrupt[x]=loadImage("img/stage 4/Home/"+"IMG_63"+(x+20)+".PNG");
     }
     // frameRate(2);
@@ -67,6 +66,7 @@ class Home {
       } else if (t>8 && t<=15) {
 
         //show dad come out
+        s4_door.play();
         background(255);
         if (T%30==0) 
           x = (currentFrameB++)%numFrame2;
