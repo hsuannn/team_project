@@ -17,8 +17,7 @@ class Mailgirl {
       if (line.choice==3) {
         image(win, this.x, this.y);
         isWin1 = true;
-      }
-      else
+      } else
         image(lose, this.x, this.y);
     }
   }
@@ -29,7 +28,6 @@ class Line {
   int choice = 0;
   boolean isEnd = false;
   PImage mail;
-  boolean isWin1 = false;
 
   Line() {
     mail = loadImage("img/stage 1/letter.png");

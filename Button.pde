@@ -14,9 +14,9 @@ class Button {
   }
 
   void display() {
-    fill(255, 0, 0);
-    noStroke();
-    ellipse(x+w/2, y+h/2, w, h);
+    //fill(255, 0, 0);
+    //noStroke();
+    //ellipse(x+w/2, y+h/2, w, h);
     image(img, x, y);
   }
 }

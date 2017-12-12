@@ -7,8 +7,7 @@ class GameState
   static final int STAGE_2 = 4;
   static final int STAGE_3 = 5;
   static final int STAGE_4 = 6;
-  static final int STAGE_5 = 7;
-  static final int END = 8;
+  static final int END = 7;
 }
 
 class Direction
@@ -21,21 +20,13 @@ class Direction
 
 /* 3 */
 Car [] car = new Car[10];
-int[] road=new int[100];
+int [] road=new int[100];
 couple gee;
 int c=1;
+int wait=0, walk=0, win=0;
 PImage imgboom;
-int wait=0;
-int walk=0;
-int win=0;
-PImage s3_text;
-PImage s3;
-PImage wait1;
-PImage wait2;
-PImage walk1;
-PImage walk2;
-PImage win1;
-PImage win2;
+PImage s3_text, s3;
+PImage wait1, wait2, walk1, walk2, win1, win2;//couple
 PImage cimg1, cimg2, cimg3, cimg4, cimg5, cimg6;
 float peoplex, peopley;
 
@@ -45,36 +36,39 @@ int bnumFrames=4;
 int currentFrame;
 PImage [] images = new PImage[numFrames];
 PImage [] bimages = new PImage[bnumFrames];
-PImage s2_text;
-PImage burp;
-PImage rude;
+PImage s2, s2_text;
+PImage burp, rude;
 PImage girle1, girle2, girlm1, girlm2;
-PImage s2;
-int i;
-int x;
-int mad=0;
-int girle=0;
-int girlm=0;
-int bur=0;
-PFont word;
+int i, x, count=0;
+int mad=0, girle=0, girlm=0, bur=0;
 boolean isStop_2 = false;
 
 /* 4 */
-//Button button;
-//Timer timer;
-//Fire fire;
-//Home home;
-//Sea sea;
-int start = 0;
-final int  CHOOSE=0, STARTFIRE=1, STARTHOME=2, STARTSEA=3;
-PImage stage4, nextTime, proposal, but1, but2, but3, stage4text;
+Fire fire;
+Sea sea;
+Home home;
+final int  S4_CHOOSE=0, S4_FIRE=1, S4_SEA=2, S4_HOME=3;
+int s4_state = S4_CHOOSE;
+PImage s4, s4_text;
+Button nextTime, proposal, tryAgain, firework, seaside, gfhome;
+boolean isStop_4 = false;
+boolean isWin4 = false;
 
 /* comment */
 PImage one, two, three, four;
 
-
+/* 1 */
 PImage title_img, intro_img, name_img; //START
 PImage s1, s1_text;
+boolean isWin1 = false;
+Mailgirl mailgirl;
+Line line;
+Button [] mail = new Button[5];
+
+import ddf.minim.*;
+Minim minim;
+AudioPlayer s1_bg,s1_heart,s2_bur,s3_car,clap,ah,s4_fire,s4_door,s4_beach;
+
 boolean isMovingUp;
 boolean isMovingDown;
 boolean isMovingLeft;
@@ -82,18 +76,16 @@ boolean isMovingRight;
 boolean mailClick = false;
 
 int state = GameState.START, s = 0;
-boolean isWin1 = false;
 
 int timeWait = 3000;
 int time;
 
 Boy boy;
-Mailgirl mailgirl;
 Score score;
-Line line;
+
 String name = "", Girl = "Amy";
 Button gameStart, intro;
-Button [] mail = new Button[5];
+
 
 void setup () {
   size(500, 500);
@@ -106,8 +98,8 @@ void setup () {
   name_img = loadImage("img/開頭/enter_name.png");
   s1 = loadImage("img/stage 1/stage1.png");
   s1_text = loadImage("img/stage 1/stage1_text.png");
-  gameStart = new Button("img/開頭/start_button", 300, 400);
-  intro = new Button("img/開頭/intro_button", 100, 400);
+  gameStart = new Button("img/開頭/start_button", 300, 380);
+  intro = new Button("img/開頭/intro_button", 100, 380);
   for (int a=0; a<5; a++)
     mail[a] = new Button("img/stage 1/letter", 85+a*75, 220);
 
@@ -116,6 +108,7 @@ void setup () {
   three = loadImage("img/評語/comment_3.png");
   four = loadImage("img/評語/comment_45.png");
 
+  frameRate(60);
 
   /* 2 */
   s2 = loadImage ("img/stage 2/stage2.png");
@@ -127,7 +120,6 @@ void setup () {
   girlm1 = loadImage ("img/stage 2/gfMad1.PNG");
   girlm2 = loadImage ("img/stage 2/gfMad2.PNG");
   currentFrame = 0;
-  word = createFont("img/stage 2/Arial", 24);
   for (int i=0; i<numFrames; i++) {
     images[i] = loadImage("img/stage 2/bfBurp" + (i*2+1) + ".PNG");
   }
@@ -159,25 +151,22 @@ void setup () {
   car[4]=new Car(522, 0, -4, cimg5, -50);
   car[5]=new Car(-10, 0, 5, cimg6, 550);
   gee = new couple(width/2, 85);
-  for (int i=0; i<6; i++)
-  {
+  for (int i=0; i<6; i++) {
     road[i]=0;
   }
 
   /* 4 */
-  //fire = new Fire();
-  //home = new Home();
-  //timer = new Timer(0);
-  //sea= new Sea();
-  stage4=loadImage("img/stage 4/stage4.png");
-  stage4text=loadImage("img/stage 4/stage4_text.png");
-  nextTime=loadImage("img/stage 4/button_nexttime.png");
-  proposal=loadImage("img/stage 4/button_proposal.png");
-  but1=loadImage("img/stage 4/stage4_button1.png");
-  but2=loadImage("img/stage 4/stage4_button2.png");
-  but3=loadImage("img/stage 4/stage4_button3.png");
-
-  //image(stage4text,0,0);
+  fire = new Fire();
+  home = new Home();
+  sea= new Sea();
+  s4=loadImage("img/stage 4/stage4.png");
+  s4_text=loadImage("img/stage 4/stage4_text.png");
+  nextTime = new Button("img/stage 4/button_nexttime", 150, 100);
+  proposal = new Button("img/stage 4/button_proposal", 250, 100);
+  tryAgain = new Button("img/通用文字、按鈕/button_tryagain", 150, 100);
+  firework = new Button("img/stage 4/stage4_button1", width/4-50, height/2);
+  seaside = new Button("img/stage 4/stage4_button2", width/2-50, height/2);
+  gfhome = new Button("img/stage 4/stage4_button3", width*3/4-50, height/2);
 }
 
 void draw() {
@@ -188,19 +177,22 @@ void draw() {
     gameStart.display();
     intro.display();
     break;
+
   case GameState.INTRO:
     image(intro_img, 70, 150);
     textSize(15);
+    fill(255, 0, 0);
     textAlign(CENTER);
     text("press enter back to title", 250, 450);
     break;
+
   case GameState.NAME:
     image(name_img, 80, 80);
     if (name!=null) {
       textSize(50); 
       fill(0);
       textAlign(CENTER);
-      text(name, 250, 180);
+      text(name, 250, 182);
     }
     if (Girl!=null) {
       textSize(50); 
@@ -209,13 +201,12 @@ void draw() {
       text(Girl, 250, 375);
     }
     break;
+
   case GameState.STAGE_1:
     if (millis()-time <= timeWait) {
       image(s1_text, 140, 190);
       textSize(25); 
       fill(0);
-      text(Girl, 140+115, 190+28);
-      text(Girl, 140+172, 190+128);
     } else {
       line.draw();
       line.redLine();
@@ -231,61 +222,52 @@ void draw() {
       break;
     }
     break;
+
   case GameState.STAGE_2:
     if (millis()-time <= timeWait) {
       image(s2_text, 80, 170);
       textSize(20); 
       fill(0);
-      text(Girl, 80+116, 170+28);
-      //text(Girl, 140+172, 190+128);
     } else {
       if (!isStop_2) {
         image(s2, 0, 0);
-        /*if (frameCount % 30 !=0 && bur==1 && i!=0 ) {
-         image(burp, 180, 300);
-         mad=0;
-         } else if (frameCount % 30 !=0 && bur==1 && i==0 )
-         {
-         image(burp, 180, 300);
-         mad=1;
-         } else {
-         bur=0;
-         }*/
-
-        if (frameCount % 20 !=0 &&girle==0&& mad==0 ) {
+        if (girle==0&& mad==0 ) {
           image(girle1, 300, 300);
-        } else if (frameCount % 20 ==0 &&girle==0&& mad==0 ) {
-          girle++;
-        } else if (frameCount % 20 !=0 &&girle==1&& mad==0 ) {
+          if (frameCount % 20 ==0) {
+            girle++;
+          }
+        } else if (girle==1&& mad==0 ) {
           image(girle2, 300, 300);
-        } else if (frameCount % 20 ==0&&girle==1&& mad==0 ) {
-          girle--;
-        } else if (frameCount % 20 !=0 &&girlm==0 && mad==1 ) {
+          if (frameCount % 20 ==0 ) {
+            girle--;
+          }
+        } else if (girlm==0 && mad==1 ) {
           image(girlm1, 300, 300);
           image(rude, 300, 250);
-        } else if (frameCount % 20 ==0 &&girlm==0&& mad==1 ) {
-          girlm++;
-        } else if (frameCount % 20 !=0 &&girlm==1&& mad==1 ) {
+          if (frameCount % 20 ==0) {
+            girlm++;
+          }
+        } else if (girlm==1&& mad==1 ) {
           image(girlm2, 300, 300);
           image(rude, 300, 250);
-        } else if (frameCount % 20 ==0&&girlm==1&& mad==1 ) {
-          girlm--;
+          if (frameCount % 20 ==0 ) {
+            girlm--;
+          }
         }
 
         if (frameCount % (30) == 0) {
           i = (currentFrame ++) % numFrames;
-        } else {
-          if (bur==0||(bur==1&&i==4))
-            image(images[i], 100, 300);
-          else if (bur==1&&i==0)
-            image(bimages[0], 100, 300);
-          else if (bur==1&&i==1)
-            image(bimages[1], 100, 300);
-          else if (bur==1&&i==2)
-            image(bimages[2], 100, 300);
-          else if (bur==1&&i==3)
-            image(bimages[3], 100, 300);
-        }
+        } 
+        if (bur==0||(bur==1&&i==4))
+          image(images[i], 100, 300);
+        else if (bur==1&&i==0)
+          image(bimages[0], 100, 300);
+        else if (bur==1&&i==1)
+          image(bimages[1], 100, 300);
+        else if (bur==1&&i==2)
+          image(bimages[2], 100, 300);
+        else if (bur==1&&i==3)
+          image(bimages[3], 100, 300);
       } else {
         if (girle==0&& mad==0 ) {
           image(girle1, 300, 300);
@@ -333,10 +315,18 @@ void draw() {
         fill(255, 0, 0);
         textAlign(CENTER);
         text("press enter to the next stage", 250, 80);
+        if (count>=10) {
+          textSize(30);
+          textAlign(CENTER);
+          fill(0);
+          text("So disgusting!! Hate!!", 250, 200);
+          mad = 1;
+        }
       }
     }
     score.draw();
     break;
+
   case GameState.STAGE_3:
     if (gee.x>=450)
     {
@@ -355,8 +345,6 @@ void draw() {
       image(s3_text, 60, 190);
       textSize(20); 
       fill(0);
-      text(Girl, 60+232, 190+28);
-      //text(Girl, 140+172, 190+128);
     } else {
       stroke(0);
       strokeWeight(5);
@@ -370,30 +358,36 @@ void draw() {
        line(0, 295, 500, 295);
        line(0, 370, 500, 370);*/
 
-      if (frameCount % 30 !=0 &&  gee.y==85 && wait==0) {
+      if (gee.y==85 && wait==0) {
         image(wait1, gee.x, gee.y);
-      } else if (frameCount % 30 ==0 &&  gee.y==85 && wait==0) {
-        wait++;
-      } else if (frameCount % 30 !=0 &&  gee.y==85 && wait==1) {
+        if (frameCount % 30 ==0 ) {
+          wait++;
+        }
+      } else if ( gee.y==85 && wait==1) {
         image(wait2, gee.x, gee.y);
-      } else if (frameCount % 30 ==0 && gee.y==85 && wait==1) {
-        wait--;
-      } else if (frameCount % 20 !=0 && gee.y<420  && walk==0) {
+        if (frameCount % 30 ==0) {
+          wait--;
+        }
+      } else if ( gee.y<420  && walk==0) {
         image(walk1, gee.x, gee.y);
-      } else if (frameCount % 20 ==0 && gee.y<420 && walk==0) {
-        walk++;
-      } else if (frameCount % 20 !=0  && gee.y<420 && walk==1) {
+        if (frameCount % 20 ==0 ) {
+          walk++;
+        }
+      } else if ( gee.y<420 && walk==1) {
         image(walk2, gee.x, gee.y);
-      } else if (frameCount % 20 ==0 && gee.y<420  && walk==1) {
-        walk--;
-      } else if (frameCount % 30 !=0 && gee.y>=420 && win==0) {
+        if (frameCount % 20 ==0) {
+          walk--;
+        }
+      } else if ( gee.y>=420 && win==0) {
         image(win1, gee.x, gee.y);
-      } else if (frameCount % 30 ==0 && gee.y>=420 && win==0) {
-        win++;
-      } else if (frameCount % 30 !=0 && gee.y>=420 && win==1) {
+        if (frameCount % 30 ==0) {
+          win++;
+        }
+      } else if (gee.y>=420 && win==1) {
         image(win2, gee.x, gee.y);
-      } else if (frameCount % 30 ==0 &&gee.y>=420 && win==1) {
-        win--;
+        if (frameCount % 30 ==0 ) {
+          win--;
+        }
       }
       if (gee.y>=420) {
         textSize(15);
@@ -442,87 +436,56 @@ void draw() {
     }
     score.draw();
     break;
+
   case GameState.STAGE_4:
-   // image(stage4, 0, 0);
-   /*
-    image(but1, width/4-34, height/2);
-    image(but2, width/2-34, height/2);
-    image(but3, width/1.3-34, height/2);
-
-    image(nextTime, -100-34, -100);
-    image(proposal, -100-34, -100);
-    switch(start) {
-
-      //  case DISCR:
-
-      //timer.currentTime++;
-      //if(timer.currentTime>4){
-      //image(stage4text,-1000,0);
-      //start=CHOOSE;
-      ////}
-
-      //    break;
-
-    case CHOOSE:
-      if (mousePressed) {
-        if ( (mouseX<=125+110-34) && (mouseX >=(width/4-34)) && (mouseY<=(height/2+60)) && (mouseY>=(height/2)) ) {
-
-          start=STARTFIRE;
-        } else if ( (mouseX<=250-34+110) && (mouseX >=(width/2-34)) && (mouseY<=(height/2+60)) && (mouseY>=(height/2)) ) {
-
-          start=STARTSEA;
-        } else if ( (mouseX<=(width/1.3)-34+110) && (mouseX >=(width/1.3-34)) && (mouseY<=(height/2+60)) && (mouseY>=(height/2)) ) {
-
-          start=STARTHOME;
-        }
+    if (millis()-time <= timeWait) {
+      image(s4_text, 90, 160);
+      textSize(20); 
+      fill(0);
+    } else {
+      image(s4, 0, 0);
+      switch(s4_state) {
+      case S4_CHOOSE:
+        firework.display();
+        seaside.display();
+        gfhome.display();
+        break;
+      case S4_FIRE:
+        fire.display();
+        break;
+      case S4_SEA:
+        sea.display();
+        break;
+      case S4_HOME:
+        home.display();
+        break;
       }
-      break;
-
-    case STARTFIRE:
-      background(255);
-      image(stage4, -100, -100);
-      image(but1, -500+width/4, -500+height/2);
-      image(but2, -500+width/2, -500+ height/2);
-      image(but3, -500+width/1.3, -500+ height/2);
-
-      fire.display();
-      break;
-
-    case STARTSEA:
-      background(255);
-      image(stage4, -100, -100);
-      image(but1, -500+width/4, -500+height/2);
-      image(but2, -500+width/2, -500+ height/2);
-      image(but3, -500+width/1.3, -500+ height/2);
-      sea.display();
-      break;
-
-    case STARTHOME:
-      background(255);
-      image(stage4, -100, -100);
-      image(but1, -500+width/4, -500+ height/2);
-      image(but2, -500+width/2, -500+ height/2);
-      image(but3, -500+width/1.3, -500+height/2);
-      home.draw();
-
-      break;
     }
-*/
     score.draw();
     break;
-    //case GameState.STAGE_5:
-    //   break;
+
   case GameState.END:
-    if (score.value==1)
-      image(one, 0, 0);
-    else if (score.value==2)
-      image(two, 0, 0);
-    else if (score.value==3)
-      image(three, 0, 0);
-    else if (score.value==4||score.value==5)
-      image(four, 0, 0);
-    //score.draw();
-    mailClick = false;
+    if (millis()-time <= 10000) {
+      textSize(30);
+      textAlign(CENTER);
+      fill(0);
+      text("Ni yee way ni der min zi", 250, 200);
+      text("boo huay jai chu shen ler mi??", 250, 300);
+    } else if (millis()-time <= 13000) {
+      textSize(60); 
+      fill(0);
+      text(name+"!!!!!", 250, 250);
+    } else {
+      if (score.value==1)
+        image(one, 0, 0);
+      else if (score.value==2)
+        image(two, 0, 0);
+      else if (score.value==3)
+        image(three, 0, 0);
+      else if (score.value==4||score.value==5)
+        image(four, 0, 0);
+      //score.draw();
+    }
     break;
   }
 }
@@ -584,20 +547,42 @@ void keyReleased() {
   if (key == ' ') {
     if (state == GameState.STAGE_2) {
       bur = 1;
+      count++;
       isStop_2 = true;
     }
   }
   if (key == ENTER) {
     switch(state) {
     case GameState.NAME:
+      time = millis();
       state = GameState.STAGE_1;
       break;
     case GameState.INTRO:
     case GameState.END:
-      for (int a=0; a<4; a++) {
-        score.gameWin[a] = 0;
+      if (state==GameState.INTRO || millis()-time>=15000) {
+        for (int a=0; a<4; a++) {
+          score.gameWin[a] = 0;
+        }
+        name = "";
+        line.lineY = 0;
+        line.choice = 0;
+        line.isEnd = false;
+        isWin1 = false;
+        isWin4 = false;
+        mailClick = false;
+        isStop_2 = false;
+        mad = 0;
+        count = 0;
+        gee.x = width/2;
+        gee.y = 85;
+        win = 0;
+        isStop_4 = false;
+        fire.sceneFire = 0;
+        sea.stageProposal = 0;
+        home.scene = 0;
+        s4_state = 0;
+        state = GameState.START;
       }
-      state = GameState.START;
       break;
     case GameState.STAGE_1:
       if (line.isEnd) {
@@ -606,15 +591,22 @@ void keyReleased() {
       }
       break;
     case GameState.STAGE_2:
-      state = GameState.STAGE_3;
-      time = millis();
+      if (isStop_2) {
+        state = GameState.STAGE_3;
+        time = millis();
+      }
       break;
     case GameState.STAGE_3:
-      state = GameState.STAGE_4;
-      time = millis();
+      if (gee.y>=420) {
+        state = GameState.STAGE_4;
+        time = millis();
+      }
       break;    
     case GameState.STAGE_4:
-      state = GameState.END;
+      if (isStop_4==true) {
+        state = GameState.END;
+        time = millis();
+      }
       break;
     default : 
       break ;
@@ -658,6 +650,54 @@ void mousePressed() {
         // hit start
         mailClick = true;
         line.choice = a+1;
+      }
+    }
+  }
+  if (state == GameState.STAGE_4) {
+    if (s4_state==S4_CHOOSE) {
+      if (mousePressed) {
+        if (mouseX > firework.x && mouseY > firework.y &&
+          mouseX < firework.x+firework.w && mouseY < firework.y+firework.h) {
+          s4_state = S4_FIRE;
+        } else if (mouseX > seaside.x && mouseY > seaside.y &&
+          mouseX < seaside.x+seaside.w && mouseY < seaside.y+seaside.h) {
+          s4_state = S4_SEA;
+        } else if (mouseX > gfhome.x && mouseY > gfhome.y &&
+          mouseX < gfhome.x+gfhome.w && mouseY < gfhome.y+gfhome.h) {
+          s4_state = S4_HOME;
+        }
+      }
+    }
+    if (fire.sceneFire == fire.SIT && fire.t>5) {
+      if (mouseX > nextTime.x && mouseY > nextTime.y &&
+        mouseX < nextTime.x+nextTime.w && mouseY < nextTime.y+nextTime.h) {
+        state++;
+      } else if (mouseX > proposal.x && mouseY > proposal.y &&
+        mouseX < proposal.x+proposal.w && mouseY < proposal.y+proposal.h) {
+        fire.T = 0;
+        fire.sceneFire = fire.PROPOSING;
+      }
+    }
+    if (home.scene == home.TALKING && home.t>5) {
+      if (mouseX > nextTime.x && mouseY > nextTime.y &&
+        mouseX < nextTime.x+nextTime.w && mouseY < nextTime.y+nextTime.h) {
+        time = millis();
+        state++;
+      } else if (mouseX > proposal.x && mouseY > proposal.y &&
+        mouseX < proposal.x+proposal.w && mouseY < proposal.y+proposal.h) {
+        home.T = 0;
+        home.scene = home.SAYLIKE;
+      }
+    }
+    if (sea.stageProposal == sea.SIT && sea.t>5) {
+      if (mouseX > nextTime.x && mouseY > nextTime.y &&
+        mouseX < nextTime.x+nextTime.w && mouseY < nextTime.y+nextTime.h) {
+        time = millis();
+        state++;
+      } else if (mouseX > proposal.x && mouseY > proposal.y &&
+        mouseX < proposal.x+proposal.w && mouseY < proposal.y+proposal.h) {
+        sea.T = 0;
+        sea.stageProposal = sea.PROPOSE;
       }
     }
   }

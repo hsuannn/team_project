@@ -16,12 +16,23 @@ class Score {
 
     if (isWin1==true) {
       gameWin[0] = 1;
+    } else {
+      gameWin[0] = 0;
     }
-    if(bur==1 && mad==0){
+    if (isStop_2 && mad==0) {
       gameWin[1] = 1;
+    } else {
+      gameWin[1] = 0;
     }
-    if(win==1){
+    if (gee.y>=420) {
       gameWin[2] = 1;
+    } else {
+      gameWin[2] = 0;
+    }
+    if (isWin4==true) {
+      gameWin[3] = 1;
+    } else {
+      gameWin[3] = 0;
     }
 
     value = 1+gameWin[0]+gameWin[1]+gameWin[2]+gameWin[3];
